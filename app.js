@@ -165,6 +165,7 @@
 
         this.selectedPriority = 3;
         this._confirmResolve = null;
+        this._isSaving = false; // 保存状态锁
 
         this.bindEvents();
       }
@@ -376,37 +377,49 @@
       }
 
       async saveNote() {
-        const content = this.els.noteContent.value.trim();
-        if (!content) {
-          this.showToast('请输入内容');
-          this.els.noteContent.focus();
-          return;
+        // 防止重复提交
+        if (this._isSaving) return;
+        this._isSaving = true;
+        this.els.saveBtn.disabled = true;
+        this.els.saveBtn.textContent = '保存中...';
+
+        try {
+          const content = this.els.noteContent.value.trim();
+          if (!content) {
+            this.showToast('请输入内容');
+            this.els.noteContent.focus();
+            return;
+          }
+
+          const now = await TimeService.getNetworkTime();
+
+          if (this.editingNote) {
+            // Update
+            this.editingNote.content = content;
+            this.editingNote.priority = this.selectedPriority;
+            this.editingNote.updatedAt = now;
+            await this.db.update(this.editingNote);
+            this.showToast('已更新');
+          } else {
+            // Create
+            const note = {
+              content,
+              priority: this.selectedPriority,
+              completed: false,
+              createdAt: now,
+              updatedAt: now,
+            };
+            await this.db.add(note);
+            this.showToast('已创建');
+          }
+
+          this.closeModal();
+          this.loadNotes();
+        } finally {
+          this._isSaving = false;
+          this.els.saveBtn.disabled = false;
+          this.els.saveBtn.textContent = '保存';
         }
-
-        const now = await TimeService.getNetworkTime();
-
-        if (this.editingNote) {
-          // Update
-          this.editingNote.content = content;
-          this.editingNote.priority = this.selectedPriority;
-          this.editingNote.updatedAt = now;
-          await this.db.update(this.editingNote);
-          this.showToast('已更新');
-        } else {
-          // Create
-          const note = {
-            content,
-            priority: this.selectedPriority,
-            completed: false,
-            createdAt: now,
-            updatedAt: now,
-          };
-          await this.db.add(note);
-          this.showToast('已创建');
-        }
-
-        this.closeModal();
-        this.loadNotes();
       }
 
       async toggleComplete(id) {

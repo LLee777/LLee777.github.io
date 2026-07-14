@@ -68,6 +68,39 @@
       border-radius: 20px;
     }
 
+    /* Notification Button */
+    .notify-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border: 1.5px solid var(--accent);
+      border-radius: 20px;
+      background: var(--accent-light);
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .notify-btn:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .notify-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .notify-btn.granted {
+      border-color: var(--p4);
+      background: rgba(39, 174, 96, 0.1);
+      color: var(--p4);
+    }
+
     /* Search */
     .search-bar {
       position: relative;

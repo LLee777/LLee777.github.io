@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#C75B39">
   <title>便利贴</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23F5F0E8'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='300'>📝</text></svg>">
+  <link rel="apple-touch-icon" href="https://llee777.github.io/LOGO.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -21,7 +21,16 @@
   <header class="header">
     <div class="header-top">
       <h1>便利贴</h1>
-      <span class="stats" id="stats">0 条记录</span>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="notifyBtn" class="notify-btn" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+          </svg>
+          <span>开启通知</span>
+        </button>
+        <span class="stats" id="stats">0 条记录</span>
+      </div>
     </div>
     <div class="search-bar">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
