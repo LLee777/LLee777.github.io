@@ -161,6 +161,7 @@
           confirmCancel: document.getElementById('confirmCancel'),
           confirmOk: document.getElementById('confirmOk'),
           toast: document.getElementById('toast'),
+          notifyBtn: document.getElementById('notifyBtn'),
         };
 
         this.selectedPriority = 3;
@@ -219,6 +220,11 @@
         this.els.modalOverlay.addEventListener('click', () => this.closeModal());
         this.els.cancelBtn.addEventListener('click', () => this.closeModal());
         this.els.saveBtn.addEventListener('click', () => this.saveNote());
+
+        // Notification button
+        if (this.els.notifyBtn) {
+          this.els.notifyBtn.addEventListener('click', () => this.requestNotification());
+        }
 
         // Priority selector
         this.els.prioritySelector.querySelectorAll('.priority-option').forEach(opt => {
@@ -537,6 +543,48 @@
         div.textContent = text;
         return div.innerHTML;
       }
+
+      // 请求通知权限（必须由用户点击触发）
+      async requestNotification() {
+        if (typeof notificationService === 'undefined') return;
+
+        const result = await notificationService.requestPermission();
+        
+        if (result.success) {
+          this.showToast('通知已开启');
+          notificationService.sendText('便利贴通知已开启，重要提醒不会错过！');
+          this.updateNotifyButton();
+        } else {
+          if (result.reason === 'denied') {
+            this.showToast('通知权限被拒绝，请在系统设置中开启');
+          } else if (result.reason === 'unsupported') {
+            this.showToast('当前环境不支持通知');
+          } else {
+            this.showToast('通知开启失败');
+          }
+        }
+      }
+
+      // 更新通知按钮状态
+      updateNotifyButton() {
+        if (typeof notificationService === 'undefined' || !this.els.notifyBtn) return;
+
+        const status = notificationService.getStatus();
+        const btn = this.els.notifyBtn;
+
+        // 始终显示按钮，让用户知道有通知功能
+        btn.style.display = 'flex';
+
+        if (status === 'granted') {
+          // 已授权，显示"已开启"样式
+          btn.classList.add('granted');
+          btn.querySelector('span').textContent = '已开启';
+        } else {
+          // 未授权、已拒绝或不支持，显示"开启通知"
+          btn.classList.remove('granted');
+          btn.querySelector('span').textContent = '开启通知';
+        }
+      }
     }
 
     // ==================== App Init ====================
@@ -549,11 +597,9 @@
 
       // 初始化通知服务
       if (typeof notificationService !== 'undefined') {
-        const granted = await notificationService.init();
-        // 如果通知可用且已授权，发送一个欢迎通知
-        if (granted) {
-          notificationService.sendText('便利贴已就绪，随时记录你的想法！');
-        }
+        await notificationService.init();
+        // 更新通知按钮状态
+        ui.updateNotifyButton();
       }
     }
 
