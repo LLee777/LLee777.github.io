@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            /* 100vh */
+        }
+        .container {
+            width: 100%;
+            background-color: red;
+            display: flex;
+            justify-content: space-between;
+        }
+        .left {
+            width: 20%;
+            height: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: blue;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            color:#cdc6bf;
+            
+        }
+        .right {
+            width: 30%;
+            background-color: yellow;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部区域固定高度，不参与伸缩 */
+        .right .top {
+            height: 60px;
+            flex-shrink: 0;
+            position: absolute;
+        }
+
+        /* bottom 占据剩余全部空间 */
+        .right .bottom {
+            flex: 1;           /*  ← 关键：产生明确的高度上限 */
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 防止 flex 压缩 div 的高度 */
+        .right .bottom div {
+            flex-shrink: 0; /* ← 关键 */
+            height: 30%;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid red;
+        }
+        .inline{
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <div class="top">
+                <p>13123</p>
+                <p>13123</p>
+                <p>13123</p>
+            </div>
+            <div class="bottom">
+                <span class="inline">12312</span>
+                <span class="inline">12312</span>
+                <span class="inline">12312</span>
+                <span class="inline">12312</span>
+                <div> 
+                    <!-- style="z-index: -1;position: absolute;" -->
+                    <span class="inline">77777</span>
+                    <span class="inline">12312</span>
+                    <span class="inline">88888</span>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="top">222</div>
+            <div class="bottom">
+                <div>312312</div>
+                <div>312312</div>
+                <div>312312</div>
+                <div>312312</div>
+                <div>312312</div>
+                <div>312312</div>
+                <div>312312</div>
+                <div>312312</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
