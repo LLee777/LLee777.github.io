@@ -1,105 +1,211 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body{
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            /* 100vh */
-        }
-        .container {
-            width: 100%;
-            background-color: red;
-            display: flex;
-            justify-content: space-between;
-        }
-        .left {
-            width: 20%;
-            height: 100%;
-            aspect-ratio: 1 / 1;
-            background-color: blue;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            color:#cdc6bf;
-            
-        }
-        .right {
-            width: 30%;
-            background-color: yellow;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>指纹管理器</title>
+    <!-- 引入指纹管理器脚本 -->
+  <script src="fingerprint-manager.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* 顶部区域固定高度，不参与伸缩 */
-        .right .top {
-            height: 60px;
-            flex-shrink: 0;
-            position: absolute;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-        /* bottom 占据剩余全部空间 */
-        .right .bottom {
-            flex: 1;           /*  ← 关键：产生明确的高度上限 */
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-        }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #1a1a2e;
+    }
 
-        /* 防止 flex 压缩 div 的高度 */
-        .right .bottom div {
-            flex-shrink: 0; /* ← 关键 */
-            height: 30%;
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid red;
-        }
-        .inline{
-            display: inline;
-        }
-    </style>
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-title {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .uuid-display {
+      font-family: "Courier New", monospace;
+      font-size: 14px;
+      color: #1a1a2e;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .uuid-display.empty {
+      color: #aaa;
+      font-style: italic;
+      font-family: inherit;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status.active {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status.inactive {
+      background: #fce4ec;
+      color: #c62828;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1a1a2e;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #16213e;
+    }
+
+    .btn-danger {
+      background: #fff;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+    }
+
+    .btn-danger:hover {
+      background: #fce4ec;
+    }
+
+    .source-tag {
+      font-size: 11px;
+      color: #666;
+      margin-top: 6px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="left">
-            <div class="top">
-                <p>13123</p>
-                <p>13123</p>
-                <p>13123</p>
-            </div>
-            <div class="bottom">
-                <span class="inline">12312</span>
-                <span class="inline">12312</span>
-                <span class="inline">12312</span>
-                <span class="inline">12312</span>
-                <div> 
-                    <!-- style="z-index: -1;position: absolute;" -->
-                    <span class="inline">77777</span>
-                    <span class="inline">12312</span>
-                    <span class="inline">88888</span>
-                </div>
-            </div>
-        </div>
-        <div class="right">
-            <div class="top">222</div>
-            <div class="bottom">
-                <div>312312</div>
-                <div>312312</div>
-                <div>312312</div>
-                <div>312312</div>
-                <div>312312</div>
-                <div>312312</div>
-                <div>312312</div>
-                <div>312312</div>
-            </div>
-        </div>
-    </div>
+  <h1>指纹管理器</h1>
+
+  <div class="card">
+    <div class="card-title">当前状态</div>
+    <span id="status" class="status inactive">检测中...</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">指纹 UUID</div>
+    <div id="uuid" class="uuid-display empty">加载中...</div>
+    <div id="source" class="source-tag"></div>
+  </div>
+
+  <div class="btn-group">
+    <button id="refreshBtn" class="btn-primary">刷新检测</button>
+    <button id="clearBtn" class="btn-danger">清除指纹</button>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      var statusEl = document.getElementById('status');
+      var uuidEl = document.getElementById('uuid');
+      var sourceEl = document.getElementById('source');
+      var refreshBtn = document.getElementById('refreshBtn');
+      var clearBtn = document.getElementById('clearBtn');
+
+      function updateUI(data) {
+        if (data && data.uuid) {
+          statusEl.textContent = '已激活';
+          statusEl.className = 'status active';
+          uuidEl.textContent = data.uuid;
+          uuidEl.className = 'uuid-display';
+          sourceEl.textContent = '来源: ' + (data.source === 'cookie' ? 'Cookies' : 'IndexedDB');
+        } else {
+          statusEl.textContent = '未激活';
+          statusEl.className = 'status inactive';
+          uuidEl.textContent = '未检测到指纹UUID';
+          uuidEl.className = 'uuid-display empty';
+          sourceEl.textContent = '';
+        }
+      }
+
+      async function refresh() {
+        var data = await FingerprintManager.getInfo();
+        updateUI(data);
+      }
+
+      refreshBtn.addEventListener('click', async function() {
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = '检测中...';
+        try {
+          await refresh();
+        } catch (error) {
+          uuidEl.textContent = '检测失败: ' + error.message;
+          uuidEl.className = 'uuid-display empty';
+        } finally {
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = '刷新检测';
+        }
+      });
+
+      clearBtn.addEventListener('click', async function() {
+        if (!confirm('确定要清除当前指纹吗？这将生成新的指纹UUID。')) {
+          return;
+        }
+        clearBtn.disabled = true;
+        clearBtn.textContent = '清除中...';
+        try {
+          await FingerprintManager.clear();
+          // 重新初始化，生成新的指纹
+          await FingerprintManager.init();
+          await refresh();
+        } catch (error) {
+          alert('清除失败: ' + error.message);
+        } finally {
+          clearBtn.disabled = false;
+          clearBtn.textContent = '清除指纹';
+        }
+      });
+
+      // 初始加载
+      refresh();
+    });
+  </script>
 </body>
 </html>
+

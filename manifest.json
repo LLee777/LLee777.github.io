@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Fingerprint UUID Manager",
+  "version": "1.0.0",
+  "description": "在页面加载前管理指纹UUID，支持Cookies和IndexedDB持久化存储",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["fingerprint-manager.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "指纹管理器"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
