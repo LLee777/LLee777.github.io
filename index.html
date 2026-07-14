@@ -2,210 +2,106 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>指纹管理器</title>
-    <!-- 引入指纹管理器脚本 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="便利贴">
+  <meta name="theme-color" content="#C75B39">
+  <title>便利贴</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23F5F0E8'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='300'>📝</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <script src="fingerprint-manager.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f5f7fa;
-      color: #333;
-      padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #1a1a2e;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    .card-title {
-      font-size: 12px;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-
-    .uuid-display {
-      font-family: "Courier New", monospace;
-      font-size: 14px;
-      color: #1a1a2e;
-      word-break: break-all;
-      line-height: 1.5;
-    }
-
-    .uuid-display.empty {
-      color: #aaa;
-      font-style: italic;
-      font-family: inherit;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .status.active {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .status.inactive {
-      background: #fce4ec;
-      color: #c62828;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    button {
-      flex: 1;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-primary {
-      background: #1a1a2e;
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background: #16213e;
-    }
-
-    .btn-danger {
-      background: #fff;
-      color: #c62828;
-      border: 1px solid #ffcdd2;
-    }
-
-    .btn-danger:hover {
-      background: #fce4ec;
-    }
-
-    .source-tag {
-      font-size: 11px;
-      color: #666;
-      margin-top: 6px;
-    }
-  </style>
 </head>
 <body>
-  <h1>指纹管理器</h1>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <h1>便利贴</h1>
+      <span class="stats" id="stats">0 条记录</span>
+    </div>
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索便利贴内容...">
+    </div>
+    <div class="controls">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">全部</button>
+        <button class="filter-tab" data-filter="pending">未完成</button>
+        <button class="filter-tab" data-filter="completed">已完成</button>
+      </div>
+      <button class="sort-btn" id="sortBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+        <span id="sortLabel">时间</span>
+      </button>
+    </div>
+  </header>
 
-  <div class="card">
-    <div class="card-title">当前状态</div>
-    <span id="status" class="status inactive">检测中...</span>
+  <!-- Note List -->
+  <div class="note-list" id="noteList"></div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination" style="display:none;">
+    <button id="prevBtn">上一页</button>
+    <span class="page-info" id="pageInfo"></span>
+    <button id="nextBtn">下一页</button>
   </div>
 
-  <div class="card">
-    <div class="card-title">指纹 UUID</div>
-    <div id="uuid" class="uuid-display empty">加载中...</div>
-    <div id="source" class="source-tag"></div>
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="empty-icon">📝</div>
+    <p>还没有便利贴<br>点击右下角按钮创建一条吧</p>
   </div>
 
-  <div class="btn-group">
-    <button id="refreshBtn" class="btn-primary">刷新检测</button>
-    <button id="clearBtn" class="btn-danger">清除指纹</button>
+  <!-- FAB -->
+  <button class="fab" id="fabBtn" aria-label="新建便利贴">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+  <!-- Bottom Sheet Modal -->
+  <div class="modal-sheet" id="modalSheet">
+    <div class="sheet-handle"></div>
+    <h2 id="modalTitle">新建便利贴</h2>
+    <div class="form-group">
+      <label for="noteContent">内容</label>
+      <textarea id="noteContent" placeholder="写下你的想法..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>优先级</label>
+      <div class="priority-selector" id="prioritySelector">
+        <div class="priority-option" data-priority="1">紧急</div>
+        <div class="priority-option" data-priority="2">重要</div>
+        <div class="priority-option selected" data-priority="3">一般</div>
+        <div class="priority-option" data-priority="4">较低</div>
+        <div class="priority-option" data-priority="5">日常</div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" id="cancelBtn">取消</button>
+      <button class="btn btn-primary" id="saveBtn">保存</button>
+    </div>
   </div>
 
+  <!-- Confirm Dialog -->
+  <div class="modal-overlay" id="confirmOverlay"></div>
+  <div class="confirm-dialog" id="confirmDialog">
+    <p id="confirmMessage">确定要删除这条便利贴吗？</p>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" id="confirmCancel">取消</button>
+      <button class="btn btn-danger" id="confirmOk">删除</button>
+    </div>
+  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      var statusEl = document.getElementById('status');
-      var uuidEl = document.getElementById('uuid');
-      var sourceEl = document.getElementById('source');
-      var refreshBtn = document.getElementById('refreshBtn');
-      var clearBtn = document.getElementById('clearBtn');
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
-      function updateUI(data) {
-        if (data && data.uuid) {
-          statusEl.textContent = '已激活';
-          statusEl.className = 'status active';
-          uuidEl.textContent = data.uuid;
-          uuidEl.className = 'uuid-display';
-          sourceEl.textContent = '来源: ' + (data.source === 'cookie' ? 'Cookies' : 'IndexedDB');
-        } else {
-          statusEl.textContent = '未激活';
-          statusEl.className = 'status inactive';
-          uuidEl.textContent = '未检测到指纹UUID';
-          uuidEl.className = 'uuid-display empty';
-          sourceEl.textContent = '';
-        }
-      }
-
-      async function refresh() {
-        var data = await FingerprintManager.getInfo();
-        updateUI(data);
-      }
-
-      refreshBtn.addEventListener('click', async function() {
-        refreshBtn.disabled = true;
-        refreshBtn.textContent = '检测中...';
-        try {
-          await refresh();
-        } catch (error) {
-          uuidEl.textContent = '检测失败: ' + error.message;
-          uuidEl.className = 'uuid-display empty';
-        } finally {
-          refreshBtn.disabled = false;
-          refreshBtn.textContent = '刷新检测';
-        }
-      });
-
-      clearBtn.addEventListener('click', async function() {
-        if (!confirm('确定要清除当前指纹吗？这将生成新的指纹UUID。')) {
-          return;
-        }
-        clearBtn.disabled = true;
-        clearBtn.textContent = '清除中...';
-        try {
-          await FingerprintManager.clear();
-          // 重新初始化，生成新的指纹
-          await FingerprintManager.init();
-          await refresh();
-        } catch (error) {
-          alert('清除失败: ' + error.message);
-        } finally {
-          clearBtn.disabled = false;
-          clearBtn.textContent = '清除指纹';
-        }
-      });
-
-      // 初始加载
-      refresh();
-    });
-  </script>
+  <script src="notification.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
-

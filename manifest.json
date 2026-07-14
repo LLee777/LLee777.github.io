@@ -1,28 +1,18 @@
 {
-  "manifest_version": 3,
-  "name": "Fingerprint UUID Manager",
-  "version": "1.0.0",
-  "description": "在页面加载前管理指纹UUID，支持Cookies和IndexedDB持久化存储",
-  "permissions": [
-    "storage",
-    "tabs",
-    "activeTab"
-  ],
-  "content_scripts": [
+  "name": "便利贴",
+  "short_name": "便利贴",
+  "description": "移动端便利贴应用",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5F0E8",
+  "theme_color": "#C75B39",
+  "orientation": "portrait",
+  "icons": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["fingerprint-manager.js"],
-      "run_at": "document_start",
-      "all_frames": true
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23F5F0E8'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='300'>📝</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "指纹管理器"
-  },
-  "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
-  }
+  ]
 }
