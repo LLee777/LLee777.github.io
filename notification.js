@@ -85,6 +85,7 @@ class NotificationService {
         badge: options.badge || 'https://llee777.github.io/LOGO.png',
         tag: options.tag || 'sticky-note',
         lang: 'zh-CN',
+        requireInteraction: options.requireInteraction !== undefined ? options.requireInteraction : true,
         ...options,
       });
 
@@ -93,7 +94,9 @@ class NotificationService {
         notification.close();
       };
 
-      const autoClose = options.autoClose !== false ? (options.autoClose || 5000) : 0;
+      // 仅当未设置 requireInteraction 且未禁用 autoClose 时才自动关闭
+      const shouldAutoClose = options.requireInteraction !== true && options.autoClose !== false;
+      const autoClose = shouldAutoClose ? (options.autoClose || 5000) : 0;
       if (autoClose > 0) {
         setTimeout(() => notification.close(), autoClose);
       }
@@ -116,13 +119,13 @@ class NotificationService {
     return this.send(
       `便利贴提醒 [${priority}]`,
       content,
-      { tag: `note-${note.id}`, autoClose: 8000 }
+      { tag: `note-${note.id}` }
     );
   }
 
   // 发送文本提示通知
   sendText(message) {
-    return this.send('便利贴', message, { autoClose: 4000 });
+    return this.send('便利贴', message);
   }
 
   // 初始化：仅注册 Service Worker，不请求权限
