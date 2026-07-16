@@ -162,6 +162,7 @@
           confirmOk: document.getElementById('confirmOk'),
           toast: document.getElementById('toast'),
           notifyBtn: document.getElementById('notifyBtn'),
+          testNotifyBtn: document.getElementById('testNotifyBtn'),
         };
 
         this.selectedPriority = 3;
@@ -224,6 +225,10 @@
         // Notification button
         if (this.els.notifyBtn) {
           this.els.notifyBtn.addEventListener('click', () => this.requestNotification());
+        }
+        // Test notification button
+        if (this.els.testNotifyBtn) {
+          this.els.testNotifyBtn.addEventListener('click', () => this.testNotification());
         }
 
         // Priority selector
@@ -572,17 +577,41 @@
         const status = notificationService.getStatus();
         const btn = this.els.notifyBtn;
 
-        // 始终显示按钮，让用户知道有通知功能
         btn.style.display = 'flex';
 
         if (status === 'granted') {
-          // 已授权，显示"已开启"样式
           btn.classList.add('granted');
           btn.querySelector('span').textContent = '已开启';
+          if (this.els.testNotifyBtn) {
+            this.els.testNotifyBtn.style.display = 'flex';
+          }
         } else {
-          // 未授权、已拒绝或不支持，显示"开启通知"
           btn.classList.remove('granted');
           btn.querySelector('span').textContent = '开启通知';
+          if (this.els.testNotifyBtn) {
+            this.els.testNotifyBtn.style.display = 'none';
+          }
+        }
+      }
+
+      // 测试发送通知
+      async testNotification() {
+        if (typeof notificationService === 'undefined') {
+          this.showToast('通知服务未加载');
+          return;
+        }
+
+        if (!notificationService.isAvailable()) {
+          this.showToast('请先开启通知权限');
+          return;
+        }
+
+        const sent = notificationService.sendText('这是一条测试通知，通知功能正常工作！');
+        
+        if (sent) {
+          this.showToast('测试通知已发送，请查看通知栏');
+        } else {
+          this.showToast('发送失败，请重试');
         }
       }
     }
