@@ -630,6 +630,30 @@
         // 更新通知按钮状态
         ui.updateNotifyButton();
       }
+
+      // 页面隐藏时发送状态通知
+      document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'hidden') {
+          if (typeof notificationService === 'undefined' || !notificationService.isAvailable()) return;
+          
+          const stats = await db.getStats();
+          const pendingCount = stats.pending || (stats.total - stats.completed);
+          
+          if (pendingCount > 0) {
+            notificationService.send(
+              '便利贴状态',
+              `您有 ${pendingCount} 条未完成的便利贴`,
+              { tag: 'page-hidden-status', autoClose: 5000 }
+            );
+          } else {
+            notificationService.send(
+              '便利贴状态',
+              `当前共有 ${stats.total} 条便利贴，全部已完成`,
+              { tag: 'page-hidden-status', autoClose: 4000 }
+            );
+          }
+        }
+      });
     }
 
     initApp().catch(console.error);
