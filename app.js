@@ -39,7 +39,13 @@
       }
 
       async get(id) {
-        return this._transaction('readonly', (store) => store.get(id));
+        return this._transaction('readonly', (store) => {
+          return new Promise((resolve, reject) => {
+            const request = store.get(id);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          });
+        });
       }
 
       async getAll() {
